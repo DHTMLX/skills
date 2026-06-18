@@ -189,6 +189,26 @@ if (created.id !== event.id) {
   scheduler.changeEventId(event.id, created.id);
 }
 ```
+### Auth Headers And Payload Shaping
+
+The DataProcessor handles the **write** side (create/update/delete), so auth for writes is configured on the DataProcessor, not on `scheduler.load`. Attach headers with `setTransactionMode`, and shape or cancel the outgoing request with `onBeforeUpdate`:
+
+```ts
+const dp = scheduler.createDataProcessor({ url: "/api/events", mode: "REST-JSON" });
+
+dp.setTransactionMode({ headers: { Authorization: `Bearer ${token}` } });
+
+dp.attachEvent("onBeforeUpdate", (id, state, data) => {
+  data.owner_id = currentUserId; // inject server-required fields not held on the event
+  return true;                   // return false to cancel this request
+});
+```
+
+Notes:
+- A token captured at init can go stale; read it at request time (or recreate the DataProcessor) if it can rotate during the session.
+- Server-side authorization is still mandatory — `onBeforeUpdate` is for payload shaping, not security.
+- Verify the exact `setTransactionMode` option names and event signatures with MCP.
+
 ## Manual Persistence Without DataProcessor
 
 If not using DataProcessor, listen to Scheduler events and persist changes manually:
@@ -214,6 +234,8 @@ Prefer DataProcessor unless the app architecture explicitly needs manual control
 ## Dates
 
 Use `Date` objects or date strings that match `scheduler.config.date_format` consistently.
+
+Scheduler places events by the **browser's local timezone**. If the backend stores another zone (e.g. UTC), convert to local before `parse`/`addEvent` and back before persisting — otherwise events render shifted by the offset and drift further on every save round-trip. Keep the conversion at the persistence boundary (load/save), not scattered across templates, and do it consistently for both reads and writes.
 
 ## Recurring Events
 

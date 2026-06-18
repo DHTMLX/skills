@@ -100,3 +100,15 @@ Problem:
 Fix:
 - call `scheduler.plugins({...})` before plugin-dependent config/API usage
 - verify PRO-only plugin availability
+
+## 11. Re-initializing On Every Data Or State Change
+
+Problem:
+- the app recreates the Scheduler (e.g. `getSchedulerInstance()` + `init()` + `createDataProcessor()`) whenever data, filters, or props change — commonly by putting all of it inside one reactive effect keyed on data.
+- symptoms: visible flicker/rebuild on every update, the view snapping back to the initial date/mode, duplicate DataProcessors firing requests twice, leaked event handlers, and growing memory.
+
+Fix:
+- build the instance **once** per mount; tear it down **once** on unmount.
+- reflect data changes with `scheduler.clearAll()` + `scheduler.parse(...)`, or incremental `addEvent`/`updateEvent`/`deleteEvent` (`batchUpdate` for many).
+- refresh the view or re-apply a filter with `scheduler.setCurrentView()` / `scheduler.updateView()` — not by re-initializing.
+- in React, separate "create once" (mount effect) from "feed data" (effect keyed on the data); read mutable values (filters, current user) through refs/getters in handlers registered once.

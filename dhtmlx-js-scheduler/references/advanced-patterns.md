@@ -5,6 +5,9 @@ Use this file when implementing Scheduler plugins, advanced views, resources, va
 ## Contents
 - Plugins
 - Views And Resources
+- Marked Timespans And Blocked Time
+- Client-Side Event Filtering
+- Custom Lightbox Sections
 - Multiple Scheduler Instances On One Page (**PRO only**)
 - Live Updates
 - Validation And Collision Checks
@@ -94,6 +97,76 @@ Rules:
 - events must include the configured `property`, such as `unit_id`
 - `list.key` values must match event property values
 - for multi-section events, enable `multisection` (PRO) and align persistence with the selected data shape
+
+## Marked Timespans And Blocked Time
+
+Marked timespans paint background zones — working hours, day-off, holidays, breaks. They are **not events** and Scheduler does not recompute them when the view or date changes.
+
+```ts
+scheduler.addMarkedTimespan({
+  days: 1,              // weekday 0-6 or a Date
+  zones: "fullday",     // or flattened [startMinute, endMinute] pairs
+  invert_zones: false,  // true marks everything EXCEPT the zones
+  type: "dhx_time_block",
+  css: "gray_section",
+  html: "Day off",
+  sections: { my_units_view: 1 }, // optional: limit to one Units/Timeline section
+});
+
+scheduler.deleteMarkedTimespan();             // remove all
+scheduler.deleteMarkedTimespan({ days: 1 });  // remove filtered
+```
+
+Visual marking alone does not prevent edits. To actually block creating or moving events into a zone, use `scheduler.blockTime(...)` or the `limit` plugin (verify signatures with MCP):
+
+```ts
+scheduler.plugins({ limit: true });
+```
+
+Rules:
+- Recompute and redraw timespans on `onViewChange` (and whenever availability data changes); call `deleteMarkedTimespan()` first so zones do not stack across renders.
+- `invert_zones: true` is the idiom for "closed outside business hours".
+- In Units/Timeline, scope a zone to one section via `sections: { <viewName>: sectionId }`.
+- Verify exact option names with MCP before relying on them.
+
+## Client-Side Event Filtering
+
+Filter visible events per view by assigning a predicate to `scheduler.filter_<viewName>`:
+
+```ts
+scheduler.filter_week = (id, event) => event.resource_id === selectedResource;
+scheduler.filter_month = scheduler.filter_week;
+```
+
+Scheduler dispatches to `scheduler["filter_" + currentView]`, so the suffix is the view name (`week`, `month`, a Units/Timeline view name, etc.).
+
+Rules:
+- After the filter state changes, re-apply with `scheduler.setCurrentView()` (or `scheduler.updateView()`). **Do not re-init or recreate the instance to refresh a filter** — see [known-failures.md](known-failures.md).
+- The predicate is registered once and reads external state by closure; keep that state current (or read it through a ref/getter) so the filter sees fresh values.
+- Confirm the exact `filter_<view>` suffix for custom/PRO views with MCP.
+
+## Custom Lightbox Sections
+
+Beyond the built-in section types (`textarea`, `select`, `time`, `recurring`, ...), register a custom control as a form block, then reference its name in `lightbox.sections`:
+
+```ts
+scheduler.form_blocks.my_control = {
+  render: (section) => `<div class="dhx_cal_ltext">...</div>`,
+  set_value: (node, value, ev) => { /* populate inputs from ev */ },
+  get_value: (node, ev) => { /* write values back onto ev; return display value */ },
+  focus: (node) => {},
+};
+
+scheduler.config.lightbox.sections = [
+  { name: "client", type: "my_control", map_to: "client_id" },
+  { name: "time", type: "time", map_to: "auto" },
+];
+```
+
+Rules:
+- `render` output is injected as **raw HTML** — escape any user-supplied data (same XSS rule as templates).
+- `set_value` runs **every time the lightbox opens**, not once. Do not attach un-removed `document`/global listeners there — they accumulate per open. Remove the previous listener before re-adding, or scope listeners to the section node so they are discarded with the lightbox.
+- Verify the `render`/`set_value`/`get_value`/`focus` contract and `map_to` behavior with MCP.
 
 ## Multiple Scheduler Instances On One Page
 

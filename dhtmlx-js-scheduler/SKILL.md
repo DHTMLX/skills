@@ -73,6 +73,10 @@ Consult DHTMLX MCP before using or changing:
 - DataProcessor modes, router signatures, delete confirmation, id replacement, and error handling
 - recurring event payload shape (`rrule`, `duration`, `recurring_event_id`, `original_start`, `deleted`)
 - lightbox section types and `map_to` conventions
+- custom lightbox controls via `scheduler.form_blocks` (`render`/`set_value`/`get_value`/`focus`)
+- marked timespans (`addMarkedTimespan`/`deleteMarkedTimespan`), `blockTime`, and the `limit` plugin
+- per-view event filters (`scheduler.filter_<view>`) and view refresh via `setCurrentView`/`updateView`
+- DataProcessor transaction mode, request headers, and `onBeforeUpdate` payload shaping
 - `scheduler.plugins({...})` extension loading and plugin-specific APIs
 - timeline/units view configuration (`property`, `y_property`, `x_unit`, `x_step`, `x_size`, section lists)
 - dynamic loading via `scheduler.setLoadMode`
@@ -87,8 +91,10 @@ Consult DHTMLX MCP before using or changing:
 - Use the app theme as the single source of truth.
 - Prefer documented config, templates, events, and methods over undocumented internals.
 - Keep Scheduler init/parse/events/DataProcessor cleanup in one lifecycle boundary.
+- Build the Scheduler instance once per mount; reflect data changes with `clearAll`/`parse` or incremental CRUD and refresh views with `setCurrentView`/`updateView` — do not recreate the instance to apply new data, filters, or props.
 - Activate extensions with `scheduler.plugins({...})` before using extension APIs.
 - Normalize `start_date` and `end_date` before persistence.
+- Scheduler renders events in the browser's local timezone; if the backend stores another zone (e.g. UTC), convert at the persistence boundary on the way in and out.
 - Build backend payloads explicitly from normalized event models.
 - Return `{ id: databaseId }` or `{ tid: databaseId }` after creates when the backend assigns a real id.
 - If not using DataProcessor, call `scheduler.changeEventId(tempId, databaseId)` after create persistence.
