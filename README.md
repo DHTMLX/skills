@@ -12,7 +12,7 @@ Skills pair with the DHTMLX MCP server, which provides real-time API reference. 
 
 ### `dhtmlx-js-gantt`
 
-Building and integrating the core DHTMLX JavaScript Gantt in JavaScript and TypeScript applications. Recognises all delivery channels (`dhtmlx-gantt` Standard/GPL, `@dhx/trial-gantt`, `@dhx/gantt`, `<script>`/CDN) and adapts setup, data, and theming guidance to each.
+Building and integrating the core DHTMLX JavaScript Gantt in JavaScript and TypeScript applications. Recognises all delivery channels (`dhtmlx-gantt` Community/MIT, `@dhx/trial-gantt`, `@dhx/gantt`, `<script>`/CDN) and adapts setup, data, and theming guidance to each.
 
 ### `dhtmlx-react-gantt`
 
