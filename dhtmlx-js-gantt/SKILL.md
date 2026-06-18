@@ -3,14 +3,16 @@ name: dhtmlx-js-gantt
 description: >
   Builds and integrates core DHTMLX JavaScript Gantt into JavaScript or TypeScript
   applications. Covers setup, initialization, lifecycle, gantt.parse/gantt.load,
-  templates, events, plugins, DataProcessor, task/link CRUD, resources, calendars,
-  undo/redo, row reorder, sortorder, baselines, critical path, locale/i18n,
-  styling, and theming for dhtmlx-gantt (Standard/GPL), @dhx/trial-gantt, and
-  @dhx/gantt. Applies when working with gantt charts, project timelines, task
-  dependencies, task CRUD, resource panels, working calendars, lightboxes,
-  workload views, baselines, or weekend highlighting, regardless of whether
-  "DHTMLX" is mentioned by name. Provides verified API guidance rather than
-  guessing core Gantt APIs and surfaces edition limits before scaffolding.
+  templates, events, plugins, DataProcessor, task/link CRUD, projects/summary
+  tasks, milestones, multiple instances, resources, calendars, undo/redo, row
+  reorder, sortorder, baselines, critical path, locale/i18n, styling, and
+  theming for dhtmlx-gantt (MIT Community edition at v10+, GPL Standard at v9.x),
+  @dhx/trial-gantt, and @dhx/gantt (Professional). Applies when working with
+  gantt charts, project timelines, task dependencies, task CRUD, summary tasks,
+  milestones, resource panels, working calendars, lightboxes, workload views,
+  baselines, or weekend highlighting, regardless of whether "DHTMLX" is mentioned
+  by name. Provides verified API guidance rather than guessing core Gantt APIs
+  and surfaces edition limits before scaffolding.
 ---
 
 ## Source Of Truth
@@ -28,7 +30,7 @@ If any core Gantt API detail is unclear, resolve it through DHTMLX MCP before wr
 
 Before writing code, identify:
 - **delivery**: npm package (`dhtmlx-gantt`, `@dhx/trial-gantt`, `@dhx/gantt`) — check `package.json`, imports, lockfiles. Or script tag / CDN — check `<script>` tags in HTML, vendored `dhtmlxgantt.js`, the `@license` banner inside that file, or the runtime `gantt.license` / `gantt.version` fields.
-- **edition**: `dhtmlx-gantt` and `gantt.license === "gpl"` mean Standard/GPL (PRO-only features unavailable); everything else is Professional. See [references/editions.md](references/editions.md) for the full detection procedure and the PRO-only feature list.
+- **edition**: the free `dhtmlx-gantt` package is **MIT Community at v10+** and **GPL Standard at v9.x** — resolve which by version (`gantt.version` / lockfile), since the package name is shared (`gantt.license` is `"mit"` vs `"gpl"`). `@dhx/trial-gantt` and `@dhx/gantt` are Professional. The two free editions have *different* feature sets — MIT adds projects/milestones/custom types/multiple instances but drops undo, markers, multiselect, unscheduled tasks, the new-task placeholder, working-time calendars, and WBS. See [references/editions.md](references/editions.md) for detection and the per-edition feature matrix.
 - **runtime**: plain JavaScript, TypeScript, Vite, browser-only `<script>`, or another app setup
 - **outbound changes**: no persistence, `gantt.createDataProcessor`, or custom backend/API clients
 - **inbound changes**: none, hard reload (`gantt.clearAll` + `gantt.parse`), or incremental updates via `gantt.silent`-wrapped API calls — see [references/data-and-crud.md](references/data-and-crud.md). For real-time streams use `gantt.ext.liveUpdates` — see [references/live-updates.md](references/live-updates.md).
@@ -38,7 +40,7 @@ Before writing code, identify:
 1. Confirm the installed DHTMLX Gantt package and import path.
 2. Decide the outbound and inbound change strategies before implementing CRUD or external sync.
 3. Read only the reference file needed for the task:
-   - Editions, package detection, and PRO-only feature list: [references/editions.md](references/editions.md)
+   - Editions (MIT Community / GPL Standard / PRO), version-based detection, and the per-edition feature matrix: [references/editions.md](references/editions.md)
    - Setup: [references/setup.md](references/setup.md)
    - CRUD, state, and persistence: [references/data-and-crud.md](references/data-and-crud.md)
    - Failure cases and guardrails: [references/known-failures.md](references/known-failures.md)
@@ -93,12 +95,12 @@ Consult DHTMLX MCP before using or changing:
 - When applying external changes via `gantt.addTask` / `updateTask` / `deleteTask` (or link/datastore equivalents), wrap them in `gantt.silent(...)` so they do not echo back through the DataProcessor.
 - Treat row reorder as a dedicated batch flow, not a normal single-task update.
 - Gantt template return values (`task_text`, `tooltip_text`, column `template`, scale formatters, etc.) are injected as raw HTML. Sanitize or HTML-escape every user-supplied string before it enters Gantt (or in the template) — never trust task text, descriptions, resource names, or any other free-text field to be safe.
-- When the installed package is `dhtmlx-gantt` (Standard/GPL) and the requested feature appears in the PRO-only list in [references/editions.md](references/editions.md), warn the user that the feature is PRO-only *before* scaffolding, then still scaffold the requested code. Do not silently substitute or omit it.
+- Before scaffolding a feature, confirm it exists in the *detected edition* (see [references/editions.md](references/editions.md)). If it does not — a PRO feature on either free install, **or** a Standard/GPL feature (undo, markers, multiselect, unscheduled tasks, new-task placeholder, working-time calendars, WBS) on a **MIT Community** install — warn the user *before* scaffolding, naming the edition(s) that support it and the upgrade/switch path, then still scaffold the requested code. Do not silently substitute or omit it.
 
 ## Quick Checklist
 
 - [ ] Correct package identified
-- [ ] Edition determined and PRO-only usage flagged for Standard installs
+- [ ] Edition determined (MIT vs GPL resolved by version) and any feature unavailable in that edition flagged
 - [ ] Matching CSS import used
 - [ ] Explicit height provided
 - [ ] Outbound and inbound change strategies decided

@@ -53,7 +53,7 @@ remoteUpdates.tasks({ type: "update-task", task });
 remoteUpdates.links({ type: "delete-link", link: { id } });
 ```
 
-`remoteUpdates` is idempotent against the DataProcessor and ships with both Standard and PRO. See [live-updates.md](live-updates.md) for both integration modes (custom change source and native multi-user backend) and the echo-loop guard. The manual `silent`+`batchUpdate`+API pattern above remains the right tool for non-task/link entities (resources, assignments, baselines via datastores) and for bulk syncs where you want explicit batch control.
+`remoteUpdates` is idempotent against the DataProcessor and ships with every edition (MIT Community, GPL Standard, and PRO). See [live-updates.md](live-updates.md) for both integration modes (custom change source and native multi-user backend) and the echo-loop guard. The manual `silent`+`batchUpdate`+API pattern above remains the right tool for non-task/link entities (resources, assignments, baselines via datastores) and for bulk syncs where you want explicit batch control.
 
 ## Datastores
 
@@ -134,7 +134,7 @@ Use ISO date strings or `Date` objects consistently.
 
 ## Duration Unit
 
-`gantt.config.duration_unit` (`"minute" | "hour" | "day" | "week" | "month" | "year"`) decides the unit of stored task durations. Set it at project start — changing it later usually requires converting persisted durations. Decimal duration values (e.g. a 4.5-hour task stored as `duration: 4.5`) are a PRO-only feature; on Standard, store durations as integers in the smallest unit the product needs.
+`gantt.config.duration_unit` (`"minute" | "hour" | "day" | "week" | "month" | "year"`) decides the unit of stored task durations. Set it at project start — changing it later usually requires converting persisted durations. Decimal duration values (e.g. a 4.5-hour task stored as `duration: 4.5`) are a PRO-only feature; on a free edition (MIT Community or GPL Standard), store durations as integers in the smallest unit the product needs.
 
 ## DataProcessor
 

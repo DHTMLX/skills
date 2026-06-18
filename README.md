@@ -26,6 +26,10 @@ Building and integrating DHTMLX Angular Gantt (`@dhtmlx/trial-angular-gantt` and
 
 Building and integrating DHTMLX Vue Gantt (`@dhtmlx/trial-vue-gantt` and `@dhx/vue-gantt`) - wrapper-specific setup, Vue data ownership and persistence patterns (`data.save` / `data.batchSave`), events, refs, composables, and theming approach, with known failure modes and concrete fixes.
 
+### `dhtmlx-js-scheduler`
+
+Building and integrating the core DHTMLX JavaScript Scheduler in JavaScript and TypeScript applications. Recognises all delivery channels (`dhtmlx-scheduler` Standard/GPL, `@dhx/trial-scheduler`, `@dhx/scheduler`, `<script>`/CDN) and adapts setup, data, and theming guidance to each.
+
 ### `dhtmlx-react-scheduler`
 
 Building and integrating DHTMLX React Scheduler (`@dhtmlx/trial-react-scheduler` and `@dhx/react-scheduler`) - wrapper setup, event state and persistence, scheduler views, resources, lightboxes, and conflict checks.
@@ -37,6 +41,7 @@ npx skills add DHTMLX/skills --skill dhtmlx-js-gantt
 npx skills add DHTMLX/skills --skill dhtmlx-react-gantt
 npx skills add DHTMLX/skills --skill dhtmlx-angular-gantt
 npx skills add DHTMLX/skills --skill dhtmlx-vue-gantt
+npx skills add DHTMLX/skills --skill dhtmlx-js-scheduler
 npx skills add DHTMLX/skills --skill dhtmlx-react-scheduler
 ```
 
@@ -48,6 +53,7 @@ cp -r skills/dhtmlx-js-gantt ~/.claude/skills/
 cp -r skills/dhtmlx-react-gantt ~/.claude/skills/
 cp -r skills/dhtmlx-angular-gantt ~/.claude/skills/
 cp -r skills/dhtmlx-vue-gantt ~/.claude/skills/
+cp -r skills/dhtmlx-js-scheduler ~/.claude/skills/
 cp -r skills/dhtmlx-react-scheduler ~/.claude/skills/
 ```
 

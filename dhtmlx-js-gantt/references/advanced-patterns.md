@@ -6,13 +6,13 @@ Use this file when implementing plugins, row reorder, resource panels, baselines
 - Plugins And Extensions Loader
 - Row Reorder With Sortorder Persistence
 - Resource Panel And Workload Visualization (**PRO only**)
-- Live Updates (`gantt.ext.liveUpdates`)
-- Working Calendar
+- Live Updates (`gantt.ext.liveUpdates`) (all editions)
+- Working Calendar (**not in MIT Community**)
 - Zoom
 - Baselines (**PRO only**)
 - Critical Path (**PRO only**)
-- Multiple Gantt Instances On One Page (**PRO only**)
-- Undo/Redo With State Management
+- Multiple Gantt Instances On One Page (**MIT Community v10+ and PRO**)
+- Undo/Redo With State Management (built-in undo **not in MIT Community**)
 - Backend Schema Template
 
 ## Plugins And Extensions Loader
@@ -22,16 +22,19 @@ Many `gantt.ext.*` surfaces are gated behind `gantt.plugins({...})`. Enable the 
 ```ts
 gantt.plugins({
   critical_path: true,    // PRO only — enables gantt.config.highlight_critical_path
-  marker: true,           // gantt.ext.marker (timeline markers / today line)
-  tooltip: true,          // gantt.ext.tooltips
+  marker: true,           // gantt.ext.marker (timeline markers / today line) — Standard/GPL + PRO; no-op in MIT Community
+  tooltip: true,          // gantt.ext.tooltips — all editions
   keyboard_navigation: true,
-  undo: true,             // gantt.ext.undo (Standard + PRO)
-  export_api: true,       // gantt.ext.export_api (PDF / PNG / Excel / MS Project)
+  undo: true,             // gantt.ext.undo — Standard/GPL + PRO; no-op in MIT Community
+  multiselect: true,      // gantt.ext.multiselect — Standard/GPL + PRO; no-op in MIT Community
+  export_api: true,       // gantt.ext.export_api (PDF / PNG / Excel / MS Project) — all editions
   auto_scheduling: true,  // PRO only
 });
 ```
 
 Built-in zoom (`gantt.ext.zoom`) does not require a plugin enable in current versions. Verify with MCP if the extension is unfamiliar.
+
+In the **MIT Community edition (v10+)** the `undo`, `marker`, and `multiselect` extensions are not bundled — `gantt.plugins({...})` accepts the keys silently but the features are no-ops, and the matching `gantt.ext.undo` / `gantt.ext.marker` / `gantt.ext.multiselect` surfaces (and `gantt.undo` / `gantt.addMarker` / `gantt.eachSelectedTask`) are `undefined`. They are available in the legacy GPL Standard build (v9.x) and in PRO. See [editions.md](editions.md).
 
 ## Row Reorder With Sortorder Persistence
 
@@ -51,7 +54,7 @@ Built-in zoom (`gantt.ext.zoom`) does not require a plugin enable in current ver
 
 ## Resource Panel And Workload Visualization
 
-**PRO only.** Resource management (resource grid, resource timeline, resource histogram, assignments, workload) is unavailable in Standard (`dhtmlx-gantt`). If the installed package is Standard, warn the user before scaffolding and still produce the requested code — see [editions.md](editions.md).
+**PRO only.** Resource management (resource grid, resource timeline, resource histogram, assignments, workload) is unavailable in both free editions of `dhtmlx-gantt` (MIT Community and GPL Standard). On a free install, warn the user before scaffolding and still produce the requested code — see [editions.md](editions.md).
 
 - Gantt does not enforce a fixed task field for resource binding
 - the relation is defined by `gantt.config.resource_property`, and resource features use `task[gantt.config.resource_property]`
@@ -154,6 +157,8 @@ Both integration modes — native multi-user backend and custom change source li
 
 ## Working Calendar
 
+**Not available in the MIT Community edition (v10+).** Working-time calendars are excluded from MIT: `gantt.config.work_time` and `gantt.setWorkTime(...)` are **hard no-ops** there — every hour counts as working time regardless of config, durations never skip weekends/non-working time, and per-task/multiple calendars do nothing. The APIs still exist (so calls don't throw), but they have no effect. Working calendars are available in the legacy GPL Standard build (v9.x) and in PRO (calendar-assignment to project/resource is PRO-only). On a MIT install, warn the user before scaffolding calendar logic, then either scaffold it anyway (no effect) or implement weekend/non-working styling and date math in app code via templates. See [editions.md](editions.md).
+
 - keep one source of truth for working and non-working time rules
 - configure working time through documented Gantt APIs
 - call `gantt.setWorkTime(...)` only with verified arguments for the installed version
@@ -218,7 +223,7 @@ For manual zoom (without the extension):
 
 ## Baselines
 
-**PRO only.** Baselines, deadlines, and similar custom timeline elements are PRO features. On Standard installs, warn the user before scaffolding and still produce the requested code — see [editions.md](editions.md).
+**PRO only.** Baselines, deadlines, and similar custom timeline elements are PRO features — unavailable in both free editions (MIT Community and GPL Standard). On a free install, warn the user before scaffolding and still produce the requested code — see [editions.md](editions.md).
 
 Inbuilt baselines (added in v9.0) render planned-vs-actual bars alongside each task automatically once enabled and loaded — no custom render template is required.
 
@@ -263,7 +268,7 @@ For the full surface (lightbox `{type: "baselines"}` section, `gantt.getTaskBase
 
 ## Critical Path
 
-**PRO only.** Critical path calculation is a PRO feature, gated through `gantt.plugins({ critical_path: true })`. On Standard installs, warn the user and still produce code.
+**PRO only.** Critical path calculation (and total/free slack) is a PRO feature, gated through `gantt.plugins({ critical_path: true })` — unavailable in both free editions (MIT Community and GPL Standard). On a free install, warn the user and still produce code.
 
 ```ts
 gantt.plugins({ critical_path: true });
@@ -274,10 +279,10 @@ Critical bars and links pick up `gantt_critical_task` / `gantt_critical_link` cl
 
 ## Multiple Gantt Instances On One Page
 
-**PRO only** (Commercial since Oct 6 2021, Enterprise, Ultimate). Use the factory pattern:
+Available in the **MIT Community edition (v10+)** and **PRO** (Commercial since Oct 6 2021, Enterprise, Ultimate). Not available in the legacy GPL Standard build (v9.x). Use the factory pattern, importing from whichever package is installed:
 
 ```ts
-import { Gantt } from "@dhx/gantt";
+import { Gantt } from "dhtmlx-gantt"; // MIT Community v10+ (or "@dhx/gantt" / "@dhx/trial-gantt" for PRO)
 const ganttA = Gantt.getGanttInstance();
 const ganttB = Gantt.getGanttInstance();
 
@@ -287,9 +292,11 @@ ganttB.init("ganttB_here");
 
 Each instance has its own `config`, `templates`, events, and DataProcessor. Do not import the singleton `gantt` and a factory instance in the same module — wire each feature against a single chosen reference.
 
-On Standard, fall back to a single instance.
+On the legacy GPL Standard build (v9.x), `Gantt` is not exported — fall back to a single instance. See [editions.md](editions.md).
 
 ## Undo/Redo With State Management
+
+The built-in `gantt.ext.undo` extension (`gantt.undo()` / `gantt.redo()`, `gantt.plugins({ undo: true })`) is available in the **legacy GPL Standard build (v9.x)** and in **PRO**, but **not in the MIT Community edition (v10+)** — there the plugin is a no-op and `gantt.undo` is `undefined`. On a MIT install, either warn the user that built-in undo/redo was dropped from the Community edition (PRO has it), or implement app-managed undo/redo as below. See [editions.md](editions.md).
 
 - decide whether undo/redo is Gantt-managed, app-managed, or both
 - if using an app store, snapshot normalized task and link data only

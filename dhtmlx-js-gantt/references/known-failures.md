@@ -138,6 +138,10 @@ Fix:
 - apply them to Gantt configuration
 - call `gantt.render()` after changes
 
+MIT Community edition caveat:
+- the **MIT Community edition (v10+)** has no working-time calendars: `gantt.config.work_time` and `gantt.setWorkTime(...)` are **hard no-ops** (every hour is working time, durations never skip weekends). The calls do not throw, so the bug is silent — bars just span weekends and durations don't match expectations.
+- if non-working time must be respected on a MIT install, do the date math in app code and use templates (`timeline_cell_class` / `scale_cell_class`) for styling. Working calendars are available in the legacy GPL Standard build (v9.x) and in PRO — see [editions.md](editions.md).
+
 ## 13. Destructor Called On The Singleton
 
 Problem:

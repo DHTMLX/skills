@@ -4,15 +4,16 @@ Use this file when initializing or configuring a core DHTMLX JavaScript Gantt in
 
 ## Installation
 
-Three packages are published. See [editions.md](editions.md) for the full Standard vs PRO feature matrix.
+Two public packages plus a private PRO package are published. The free `dhtmlx-gantt` is the **MIT Community edition at v10+** and the legacy **GPL Standard build at v9.x** — same package name, different edition by version. See [editions.md](editions.md) for the detection procedure and the per-edition feature matrix.
 
-Standard (GPL, free, public npm):
+Community (MIT, free, public npm — v10+; v9.x of the same package is GPL Standard):
 ```bash
 npm install dhtmlx-gantt
 ```
 
 Professional Evaluation (Trial, full PRO surface, 30 days):
 ```bash
+npm config set @dhx:registry=https://npm.dhtmlx.com
 npm install @dhx/trial-gantt
 ```
 
@@ -38,12 +39,14 @@ import "@dhx/gantt/codebase/dhtmlxgantt.css";
 
 Use the import style that matches the installed package. Check `package.json`, existing imports, and lockfiles before changing package names.
 
-Standard (GPL) package:
+Community (MIT, v10+) / Standard (GPL, v9.x) package — same import, edition determined by version:
 
 ```ts
 import { gantt } from "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
 ```
+
+In the MIT Community edition (v10+) the `Gantt` factory is also exported for multiple instances: `import { gantt, Gantt } from "dhtmlx-gantt"`.
 
 Trial package (default singleton usage):
 
@@ -68,7 +71,7 @@ import "@dhx/trial-gantt/codebase/dhtmlxgantt.css";
 const gantt = Gantt.getGanttInstance();
 ```
 
-Running more than one Gantt on the same page through `Gantt.getGanttInstance()` is a PRO-only capability (Commercial since Oct 6 2021, Enterprise, Ultimate). See [editions.md](editions.md).
+Running more than one Gantt on the same page through `Gantt.getGanttInstance()` is available in the **MIT Community edition (v10+)** and PRO (Commercial since Oct 6 2021, Enterprise, Ultimate). It is **not** available in the legacy GPL Standard build (v9.x), where `Gantt` is not exported. See [editions.md](editions.md).
 
 Do not mix singleton and factory-instance patterns in the same feature unless the feature explicitly manages multiple instances.
 
@@ -88,7 +91,7 @@ Gantt can also be loaded without a bundler — drop the JS file and matching CSS
 
 Globals exposed in this mode:
 - `window.gantt` — the singleton, present in every edition.
-- `window.Gantt` — the factory class, present only in PRO editions that support multiple instances (Commercial since Oct 6 2021, Enterprise, Ultimate). When `window.Gantt` is `undefined`, the page is running Standard or a single-instance PRO build and `Gantt.getGanttInstance()` is not available.
+- `window.Gantt` — the factory class, present in the MIT Community edition (v10+) and in PRO editions that support multiple instances (Commercial since Oct 6 2021, Enterprise, Ultimate). When `window.Gantt` is `undefined`, the page is running the legacy GPL Standard build (v9.x) or a single-instance PRO build, and `Gantt.getGanttInstance()` is not available.
 
 The same singleton-vs-factory rules apply: do not call `gantt.destructor()` on the global singleton (see Cleanup), and use `new Gantt()` / `Gantt.getGanttInstance()` only when the global is present and the edition supports it.
 
@@ -291,7 +294,7 @@ Event names and argument lists are stable but numerous. Verify unfamiliar events
 
 ## Localization
 
-Switch the active locale at runtime with `gantt.i18n.setLocale("xx")` (32 locales ship with both Standard and PRO). Per-label overrides go through `gantt.locale.labels.*`:
+Switch the active locale at runtime with `gantt.i18n.setLocale("xx")` (32 locales ship with every edition). Per-label overrides go through `gantt.locale.labels.*`:
 
 ```ts
 gantt.i18n.setLocale("ru");

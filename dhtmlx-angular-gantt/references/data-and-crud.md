@@ -33,6 +33,16 @@ interface Link {
 
 When loading from backend, map rows into app task/link models explicitly. Do not pass raw DB rows straight through.
 
+### Wrapper types: `TaskInput`, `Task`, `SerializedTask`
+
+`@dhx/angular-gantt` exports three task types — use the right one for the context:
+
+- **`TaskInput`** — data you *provide* to Gantt (the `[tasks]` input, `gantt.addTask()`, your own store/state). Date fields accept `Date` **or** `string`, and every field including `id` is optional. **Type your store/state as `TaskInput[]`** — it accepts either date form and avoids `Date`-vs-`string` type errors.
+- **`Task`** — the runtime object Gantt returns (`gantt.getTask()`): `Date` dates plus computed `$`-prefixed fields.
+- **`SerializedTask`** — the JSON/wire form: `string` dates only. Use it for server payloads, not for in-memory state seeded with `Date` objects.
+
+Common mistake (breaks on v10): typing store state as `SerializedTask[]` but seeding it with `new Date(...)` values. Since v10 `SerializedTask` date fields are `string`-only, that no longer compiles — use `TaskInput[]` (or `Task[]`). Links have no date fields, so `Link[]` or `SerializedLink[]` both work.
+
 ## Choose Ownership Model First
 
 Choose one model per page/feature area and keep it consistent.
@@ -203,3 +213,12 @@ Rules:
 - Keep frontend ordering (`sortorder`), backend payloads, and DB schema aligned.
 - If IDs are temporary on create, make ID replacement flow explicit and deterministic.
 - If the app introduces undo/redo, persistence rules must remain correct after history actions.
+
+## Migration: v9 → v10
+
+When upgrading an Angular Gantt app from 9.x to 10.x:
+
+- **Package / import path may differ** between 9.x and 10.x (and between trial and licensed builds), e.g. `@dhtmlx/trial-angular-gantt` vs `@dhx/angular-gantt`. Verify the installed package in `package.json` and align all imports.
+- **`SerializedTask` / `SerializedLink` are now strictly serialized.** Date fields are `string`-only (they were `Date | string` in 9.x) and `SerializedTask.id` is now optional. The most common upgrade break is store/seed data typed as `SerializedTask[]` but populated with `Date` objects — retype it as `TaskInput[]` (accepts `Date` or `string`) or `Task[]` (Date). See [Wrapper types](#wrapper-types-taskinput-task-serializedtask).
+- **`NewTask` → `TaskInput`.** `NewTask` is no longer deprecated; it is now an alias of `TaskInput`. Prefer `TaskInput` in new code.
+- Core-level changes also apply (auto-scheduling config, GPL → Community/MIT edition split, pure date-interval helpers). Confirm specifics via DHTMLX MCP or the official **Migration from Older Versions → 9.1 → 10.0** guide before relying on changed behavior.

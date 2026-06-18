@@ -33,6 +33,16 @@ interface Link {
 
 When loading from a backend, map rows explicitly into Gantt task/link objects. Do not pass raw DB rows straight through.
 
+### Wrapper types: `TaskInput`, `Task`, `SerializedTask`
+
+`@dhx/react-gantt` exports three task types — use the right one for the context:
+
+- **`TaskInput`** — data you *provide* to Gantt (the `tasks` prop, `gantt.addTask()`, your React state / store / Redux slice). Date fields accept `Date` **or** `string`, and every field including `id` is optional. **Type React state as `TaskInput[]`** — it accepts either date form and avoids `Date`-vs-`string` type errors.
+- **`Task`** — the runtime object Gantt returns (`gantt.getTask()`): `Date` dates plus computed `$`-prefixed fields.
+- **`SerializedTask`** — the JSON/wire form: `string` dates only. Use it for server payloads and for serialized state (e.g. a slice that stores `start_date` via `toISOString()`), not for state seeded with `Date` objects.
+
+Common mistake (breaks on v10): a `useState`/Redux slice typed as `SerializedTask[]` but seeded with `new Date(...)` values. Since v10 `SerializedTask` date fields are `string`-only, that no longer compiles — use `TaskInput[]` (or `Task[]`). If a reducer/`save` payload is already serialized (string dates), keep it `SerializedTask`. Links have no date fields, so `Link[]` or `SerializedLink[]` both work.
+
 ## Choose The Ownership Model First
 
 For most React apps, use React-managed data:
@@ -110,3 +120,12 @@ Do not switch to `batchSave` casually. Verify the exact expected behavior with M
 - Do not persist raw Gantt callback objects directly.
 - If IDs are temporary on create, make the ID replacement flow explicit and deterministic.
 - If the app introduces undo/redo, persistence rules must remain correct after history actions.
+
+## Migration: v9 → v10
+
+When upgrading a React Gantt app from 9.x to 10.x:
+
+- **Package / import path may differ** between 9.x and 10.x (and between trial and licensed builds), e.g. `@dhtmlx/trial-react-gantt` vs `@dhx/react-gantt`. Verify the installed package in `package.json` and align all imports.
+- **`SerializedTask` / `SerializedLink` are now strictly serialized.** Date fields are `string`-only (they were `Date | string` in 9.x) and `SerializedTask.id` is now optional. The most common upgrade break is a `useState`/Redux slice typed as `SerializedTask[]` but populated with `Date` objects — retype it as `TaskInput[]` (accepts `Date` or `string`) or `Task[]` (Date). If the slice genuinely stores string dates (e.g. via `toISOString()`), keep `SerializedTask` and make reducer payloads/casts `SerializedTask` too. See [Wrapper types](#wrapper-types-taskinput-task-serializedtask).
+- **`NewTask` → `TaskInput`.** `NewTask` is no longer deprecated; it is now an alias of `TaskInput`. Prefer `TaskInput` in new code.
+- Core-level changes also apply (auto-scheduling config, GPL → Community/MIT edition split, pure date-interval helpers). Confirm specifics via DHTMLX MCP or the official **Migration from Older Versions → 9.1 → 10.0** guide before relying on changed behavior.

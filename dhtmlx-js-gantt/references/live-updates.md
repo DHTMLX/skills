@@ -9,7 +9,7 @@ Use this file when Gantt must reflect changes coming from outside the page — m
 - `RemoteEvents` — opens a WebSocket connection against the documented DHTMLX multi-user backend protocol, handles handshake, subscribe/unsubscribe, and routes incoming messages.
 - `remoteUpdates` — applies incoming task/link change messages to Gantt **without notifying the DataProcessor**. Use it as the canonical channel for any external change stream, including ones that have nothing to do with the native protocol.
 
-Both helpers ship with Standard (`dhtmlx-gantt`) and Professional packages. Live updates is not listed in [editions.md](editions.md).
+Both helpers ship with **every edition** — MIT Community (v10+), GPL Standard (v9.x), and Professional. Live updates is available in all of them (it is not an edition-gated feature in [editions.md](editions.md)).
 
 ```ts
 const { RemoteEvents, remoteUpdates } = gantt.ext.liveUpdates;

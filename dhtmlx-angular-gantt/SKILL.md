@@ -36,7 +36,7 @@ Before writing code, identify:
 3. Decide the state ownership model before implementing features, and keep one model per page/feature area.
 4. Read only the reference file needed for the task:
    - Angular wrapper integration/setup: [references/angular-integration.md](references/angular-integration.md)
-   - CRUD, state, and persistence: [references/data-and-crud.md](references/data-and-crud.md)
+   - CRUD, state, persistence, wrapper task types, and v9 -> v10 migration: [references/data-and-crud.md](references/data-and-crud.md)
    - Failure cases and guardrails: [references/known-failures.md](references/known-failures.md)
    - Advanced patterns (reorder, resources, undo/redo, schema): [references/advanced-patterns.md](references/advanced-patterns.md)
    - Styling, theming, templates, and override strategy: [references/styling-and-theming.md](references/styling-and-theming.md)

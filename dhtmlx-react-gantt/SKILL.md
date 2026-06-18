@@ -39,7 +39,7 @@ Before writing code, identify:
 2. Decide the data ownership model before implementing features.
 3. Read only the reference file needed for the task:
    - React integration/setup: [references/react-integration.md](references/react-integration.md)
-   - CRUD, state, and persistence: [references/data-and-crud.md](references/data-and-crud.md)
+   - CRUD, state, persistence, wrapper task types, and v9 -> v10 migration: [references/data-and-crud.md](references/data-and-crud.md)
    - Failure cases and guardrails: [references/known-failures.md](references/known-failures.md)
    - Advanced patterns (reorder, resources, undo/redo, schema): [references/advanced-patterns.md](references/advanced-patterns.md)
    - Styling, theming, CSS variables, selectors, and template-based visual customization: [references/styling-and-theming.md](references/styling-and-theming.md)
