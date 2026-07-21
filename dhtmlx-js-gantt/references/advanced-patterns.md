@@ -81,20 +81,25 @@ Layout:
 Notes:
 
 - resource datastore may require initialization after `gantt.init`
-- the resource and assignment datasets live in dedicated datastores reachable as `gantt.$data.resourcesStore` and `gantt.$data.assignmentsStore`. Use them for wholesale or incremental updates from external sources:
+- the resource and assignment datasets live in dedicated datastores. Access them through the configured public datastore names and reuse the scoped references for wholesale or incremental updates from external sources:
 
 ```ts
+const resourceStore = gantt.getDatastore(gantt.config.resource_store);
+const assignmentStore = gantt.getDatastore(gantt.config.resource_assignment_store);
+
 // wholesale replace
-gantt.$data.resourcesStore.clearAll();
-gantt.$data.resourcesStore.parse(resources);
+resourceStore.clearAll();
+resourceStore.parse(resources);
 
 // incremental sync — wrap in gantt.silent to avoid notifying the DataProcessor
 gantt.silent(() => {
-  for (const a of addedAssignments)   gantt.$data.assignmentsStore.addItem(a);
-  for (const a of updatedAssignments) gantt.$data.assignmentsStore.updateItem(a.id, a);
-  for (const id of removedIds)        if (gantt.$data.assignmentsStore.exists(id)) gantt.$data.assignmentsStore.removeItem(id);
+  for (const a of addedAssignments)   assignmentStore.addItem(a);
+  for (const a of updatedAssignments) assignmentStore.updateItem(a.id, a);
+  for (const id of removedIds)        if (assignmentStore.exists(id)) assignmentStore.removeItem(id);
 });
 ```
+
+- documented task and datastore mutations normally trigger the required view updates. Do not add separate resource-panel renders or assignment-date synchronization by default. Some assignment-datastore flows require a documented follow-up such as `gantt.updateTaskAssignments(taskId)`; verify the exact mutation path with MCP before adding synchronization code.
 
 - `gantt.serverList(name, list)` is the canonical way to register named lookup lists used by lightbox `select` sections and resource dropdowns. Register lists *before* `gantt.init` and reference them in the lightbox config:
 
@@ -162,6 +167,9 @@ Both integration modes — native multi-user backend and custom change source li
 - keep one source of truth for working and non-working time rules
 - configure working time through documented Gantt APIs
 - call `gantt.setWorkTime(...)` only with verified arguments for the installed version
+- in task-aware code and timeline templates, pass the task to `gantt.isWorkTime({ date, task })` so task calendars are respected; scale templates have no task context and should use the global calendar
+- use `gantt.calculateDuration({ start_date, end_date, task })`, `gantt.calculateEndDate({ start_date, duration, task })`, and `gantt.getClosestWorkTime({ date, dir, task })` instead of timestamp subtraction or custom loops when schedule calculations must respect working time
+- use `gantt.date.add(date, amount, unit)` for plain calendar arithmetic; use the scheduling methods above when non-working time must be skipped
 - use templates for calendar-driven cell styling when appropriate
 - re-render Gantt after changing calendar rules
 
@@ -177,10 +185,10 @@ gantt.setWorkTime({ day: 6, hours: false });
 Calendar-driven styling should use templates rather than global date math in CSS:
 
 ```ts
-gantt.templates.timeline_cell_class = (_task, date) =>
-  isNonWorking(date) ? "weekend-cell" : "";
+gantt.templates.timeline_cell_class = (task, date) =>
+  gantt.isWorkTime({ date, task }) ? "" : "non-working-cell";
 gantt.templates.scale_cell_class = (date) =>
-  isNonWorking(date) ? "weekend-cell" : "";
+  gantt.isWorkTime({ date }) ? "" : "non-working-cell";
 ```
 
 ## Zoom

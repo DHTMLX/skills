@@ -160,7 +160,12 @@ remoteUpdates.links({ type: "update-link", link });
 remoteUpdates.links({ type: "delete-link", link: { id } });
 ```
 
-For resources, assignments, baselines, or other datastore entities, `remoteUpdates` is not the channel — apply changes through `gantt.silent(() => gantt.$data.<store>.{addItem|updateItem|removeItem}(...))` instead (see [data-and-crud.md](data-and-crud.md)).
+For resources, assignments, baselines, or other datastore entities, `remoteUpdates` is not the channel. Resolve the public datastore first, then apply changes through `gantt.silent(...)` (see [data-and-crud.md](data-and-crud.md)):
+
+```ts
+const resourceStore = gantt.getDatastore(gantt.config.resource_store);
+gantt.silent(() => resourceStore.updateItem(resource.id, resource));
+```
 
 ## Echo Loop Guard
 

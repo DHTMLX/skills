@@ -57,16 +57,26 @@ remoteUpdates.links({ type: "delete-link", link: { id } });
 
 ## Datastores
 
-Tasks and links are exposed through datastores reachable as `gantt.getDatastore("task")` and `gantt.getDatastore("link")`. Resources, assignments, and baselines (PRO only) live in their own datastores accessed the same way: `gantt.getDatastore("resource")`, `gantt.getDatastore("resourceAssignments")`, and `gantt.getDatastore("baselines")`. The resource and assignment store names are configurable via `gantt.config.resource_store` and `gantt.config.resource_assignment_store`; the baseline store name comes from `gantt.config.baselines.datastore`. Internal shortcuts `gantt.$data.resourcesStore`, `gantt.$data.assignmentsStore`, and `gantt.$data.baselineStore` resolve to the same instances and are commonly seen in wrapper code, but prefer `getDatastore(name)` in new code.
+Tasks and links are exposed through datastores reachable as `gantt.getDatastore("task")` and `gantt.getDatastore("link")`. Resources, assignments, and baselines (PRO only) live in their own datastores accessed the same way. Use their configured names rather than hardcoding defaults:
+
+```ts
+const resourceStore = gantt.getDatastore(gantt.config.resource_store);
+const assignmentStore = gantt.getDatastore(gantt.config.resource_assignment_store);
+const baselineStore = gantt.getDatastore(gantt.config.baselines.datastore);
+```
+
+Do not access internal shortcuts such as `gantt.$resourcesStore` or `gantt.$data.*`; they are not public application APIs.
 
 Each datastore exposes `.parse([...])`, `.clearAll()`, `.getItems()`, `.count()`, `.exists(id)`, `.getItem(id)`, `.addItem(item)`, `.updateItem(id, item)`, and `.removeItem(id)`. For wholesale updates to resources or assignments:
 
 ```ts
-gantt.$data.resourcesStore.clearAll();
-gantt.$data.resourcesStore.parse(resources);
+const resourceStore = gantt.getDatastore(gantt.config.resource_store);
+resourceStore.clearAll();
+resourceStore.parse(resources);
 
-gantt.$data.assignmentsStore.clearAll();
-gantt.$data.assignmentsStore.parse(assignments);
+const assignmentStore = gantt.getDatastore(gantt.config.resource_assignment_store);
+assignmentStore.clearAll();
+assignmentStore.parse(assignments);
 ```
 
 For incremental external updates wrap datastore mutations in `gantt.silent(...)` the same way as task/link updates, so the DataProcessor is not triggered for changes that already came from the backend.
