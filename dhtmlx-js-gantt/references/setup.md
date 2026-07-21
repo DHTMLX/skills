@@ -13,6 +13,7 @@ npm install dhtmlx-gantt
 
 Professional Evaluation (Trial, full PRO surface, 30 days):
 ```bash
+npm config set @dhx:registry=https://npm.dhtmlx.com
 npm install @dhx/trial-gantt
 ```
 
