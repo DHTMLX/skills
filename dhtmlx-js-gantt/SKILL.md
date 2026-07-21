@@ -88,6 +88,10 @@ Consult DHTMLX MCP before using or changing:
 - Import the matching Gantt CSS.
 - Use the app theme as the single source of truth.
 - Prefer documented config, templates, events, and methods over undocumented internals.
+- Access resources, assignments, baselines, and custom datastores with `gantt.getDatastore(...)`; never build application code around internal fields such as `gantt.$resourcesStore` or `gantt.$data.*`.
+- When schedule logic depends on working time, use Gantt's calendar-aware methods and pass task context where available: `isWorkTime`, `calculateDuration`, `calculateEndDate`, and `getClosestWorkTime`. Do not replace them with weekday checks or raw timestamp arithmetic.
+- Prefer semantic Gantt helpers such as `isSummaryTask`, `eachTask`, `getParent`, and `uid` over duplicating task-type detection, tree traversal, hierarchy lookup, or temporary-id generation.
+- Do not add manual `render`, datastore refresh, assignment-date synchronization, or resize loops after documented Gantt mutations unless the documentation for that exact flow requires it.
 - Keep DHTMLX init/parse/events/DataProcessor cleanup in one lifecycle boundary.
 - Normalize date values before persistence.
 - Build backend payloads explicitly from normalized task/link models.
@@ -107,3 +111,5 @@ Consult DHTMLX MCP before using or changing:
 - [ ] Dates normalized before persistence
 - [ ] DataProcessor return values handled
 - [ ] Advanced APIs verified with MCP
+- [ ] No undocumented datastore fields or duplicate calendar/tree helpers used
+- [ ] Manual refresh or synchronization calls justified by the documented flow

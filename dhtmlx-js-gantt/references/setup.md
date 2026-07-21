@@ -223,16 +223,14 @@ gantt.templates.task_text = (start, end, task) => {
   return task.text;
 };
 
-// Highlight timeline cells (e.g. weekends)
+// Highlight non-working timeline cells for each task calendar
 gantt.templates.timeline_cell_class = (task, date) => {
-  const day = date.getDay();
-  return day === 0 || day === 6 ? "weekend" : "";
+  return gantt.isWorkTime({ date, task }) ? "" : "non-working-time";
 };
 
-// Scale styling
+// Scale headers have no task context, so use the global calendar
 gantt.templates.scale_cell_class = (date) => {
-  const day = date.getDay();
-  return day === 0 || day === 6 ? "weekend" : "";
+  return gantt.isWorkTime({ date }) ? "" : "non-working-time";
 };
 
 // Grid column template
@@ -240,6 +238,8 @@ gantt.config.columns[0].template = (task) => {
   return task.text.toUpperCase();
 };
 ```
+
+The calendar-aware example requires an edition with working-time calendars (legacy GPL Standard or PRO). In MIT Community, use a simple weekday rule for visual highlighting only; `work_time`, task calendars, and the scheduling helpers do not skip non-working time there.
 
 Do not guess template signatures. Verify unfamiliar templates with MCP.
 
